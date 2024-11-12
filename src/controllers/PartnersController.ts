@@ -41,7 +41,7 @@ export default class PartnersController {
 
     public static async image(req: Request, res: Response) {
         if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Malformated id" });
+            res.status(400).json({ message: "Id mal formatado" });
             return;
         }
         const partner = await prisma.partner.findUnique({
@@ -50,7 +50,7 @@ export default class PartnersController {
             },
         });
         if (!partner) {
-            res.status(404).json({ message: "Partner not found" });
+            res.status(404).json({ message: "Parceiro não encontrado" });
             return;
         }
         res.setHeader("Content-Type", "image/png");
@@ -59,7 +59,7 @@ export default class PartnersController {
 
     public static async delete(req: Request, res: Response) {
         if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Malformated id" });
+            res.status(400).json({ message: "Id mal formatado" });
             return;
         }
         const partner = await prisma.partner
@@ -73,15 +73,15 @@ export default class PartnersController {
                 throw e;
             });
         if (!partner) {
-            res.status(404).json({ message: "Partner not found" });
+            res.status(404).json({ message: "Parceiro não encontrado" });
             return;
         }
-        res.json({ message: "Partner deleted" });
+        res.json({ message: "Parceiro deletado com sucesso" });
     }
 
     public static async update(req: Request, res: Response) {
         if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Malformated id" });
+            res.status(400).json({ message: "Id mal formatado" });
             return;
         }
         const { data, error } = await UpdatePartnerSchema.safeParseAsync({
@@ -116,7 +116,7 @@ export default class PartnersController {
                 throw e;
             });
         if (!partner) {
-            res.status(404).json({ message: "Partner not found" });
+            res.status(404).json({ message: "Parceiro não encontrado" });
             return;
         }
         res.json(partner);
