@@ -14,6 +14,7 @@ export const prisma = new PrismaClient();
 
 import PartnersRouter from "./routers/PartnersRouter";
 import UsersRouter from "./routers/UsersRouter";
+import AgendaRouter from "./routers/AgendaRouter";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/partner", PartnersRouter);
 app.use("/user", UsersRouter);
+app.use("/agenda", AgendaRouter);
 
 app.listen(8000, () => {
     console.log("Server is running on port 8000");
