@@ -92,13 +92,20 @@ export default class AgendaController {
     }
 
     public static async delete(req: Request, res: Response) {
-        if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Id mal formatado!" });
+        const { data, error } = await DeleteEventSchema.safeParseAsync({
+            params: {
+                id: Number(req.params.id),
+            }
+        });
+
+        if (error) {
+            res.status(400).json({ errors: error?.errors });
             return;
         }
+
         const partner = await prisma.agenda.delete({
             where: {
-                id: Number(req.params.id),
+                id: data.params.id,
             },
         }).catch((e) => {
             if (e.code === "P2025") return null;
