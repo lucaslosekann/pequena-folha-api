@@ -4,6 +4,6 @@ import UsersController from "../controllers/UsersController";
 const UsersRouter = Router();
 UsersRouter.post("/", UsersController.create);
 UsersRouter.get("/", UsersController.index);
-UsersRouter.put("/:id/password", UsersController.createPassword);
-UsersRouter.put("/:id/deactivate", UsersController.deactivate);
+UsersRouter.put("/password/:id", UsersController.createPassword);
+UsersRouter.put("/deactivate/:id", UsersController.deactivate);
 export default UsersRouter;
