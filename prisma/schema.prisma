@@ -44,3 +44,53 @@ model Agenda {
   type        String
   description String   @db.LongText
 }
+
+model Form {
+  id                        Int                    @id @default(autoincrement())
+  date                      DateTime
+  inorganicVolume           Int
+  inorganicWeight           Int
+  inorganicDescriptionOther String?
+  organicVolume             Int
+  organicWeight             Int
+  organicDescriptionOther   String?
+  wastes                    String
+  wastesVolume              Int
+  residueComposition        FormImage[]
+  inorganicDescription      InorganicDescription[]
+  organicDescription        OrganicDescription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InorganicDescription {
+  id     Int    @id @default(autoincrement())
+  text   String
+  formId Int
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
+
+model OrganicDescription {
+  id     Int    @id @default(autoincrement())
+  text   String
+  formId Int
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
+
+enum FormImageType {
+  ORGANIC
+  INORGANIC
+  WASTE
+}
+
+model FormImage {
+  id        Int           @id @default(autoincrement())
+  image     Bytes
+  formId    Int
+  type      FormImageType
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  Form Form @relation(fields: [formId], references: [id])
+}

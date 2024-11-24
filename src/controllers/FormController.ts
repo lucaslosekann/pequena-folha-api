@@ -1,60 +1,108 @@
 import { Request, Response } from "express";
 import { prisma } from "../server";
-import { CreateFormsSchema, UpdateFormsSchema } from "../schemas/FormsSchema";
+import { CreateFormSchema } from "../schemas/FormSchema";
+import { FormImageType } from "@prisma/client";
+
 export default class FormsController {
     public static async index(req: Request, res: Response) {
-        const forms = await prisma.forms.findMany({
-            select: {
-                description_residue: true,
-                vol_residue: true,
-                organic_image: true,
-                description_organic_other: true,
-                description_organic: true,
-                mass_organic: true,
-                vol_organic_other: true,
-                vol_organic: true,
-                inorganic_image: true,
-                description_inorganic_other: true,
-                description_inorganic: true,
-                mass_inorganic: true,
-                vol_inorganic_other: true,
-                vol_inorganic: true,
-                date: true,
-                name: true,
-                id: true,
+        const forms = await prisma.form.findMany({
+            include: {
+                inorganicDescription: true,
+                organicDescription: true,
+                residueComposition: {
+                    select: {
+                        id: true,
+                        type: true,
+                    },
+                },
             },
         });
         res.json(forms);
     }
 
-
-
-
-
-    public static async create(req: Request, res: Response) {
-        const { data, error } = await CreateFormsSchema.safeParseAsync({
-            name: req.body.name,
-            description: req.body.description,
-            image: req.file,
-        });
-        if (error) {
-            res.status(400).json({ errors: error?.errors });
+    public static async show(req: Request, res: Response) {
+        if (!req.params.id || isNaN(Number(req.params.id))) {
+            res.status(400).json({ message: "Id mal formatado" });
             return;
         }
-        const partner = await prisma.partner.create({
-            data: {
-                name: data.name,
-                description: data.description,
-                image: data.image.buffer,
+        const form = await prisma.form.findUnique({
+            where: {
+                id: Number(req.params.id),
             },
-            select: {
-                image: false,
-                description: true,
-                name: true,
-                id: true,
+            include: {
+                inorganicDescription: true,
+                organicDescription: true,
+                residueComposition: {
+                    select: {
+                        id: true,
+                        type: true,
+                    },
+                },
             },
         });
-        res.json(partner);
+        if (!form) {
+            res.status(404).json({ message: "Formulário não encontrado" });
+            return;
+        }
+        res.json(form);
+    }
+
+    public static async create(req: Request, res: Response) {
+        if (Array.isArray(req.files)) {
+            res.status(400).json({ error: "Invalid file format" });
+            return;
+        }
+
+        const { data, error } = await CreateFormSchema.safeParseAsync({
+            ...req.body,
+            organicResidueComposition: req.files?.organicResidueComposition,
+            inorganicResidueComposition: req.files?.inorganicResidueComposition,
+        });
+        if (error) {
+            res.status(400).json({ error });
+            return;
+        }
+        const { organicResidueComposition: _, inorganicResidueComposition: __, ...rest } = data;
+
+        const form = await prisma.form.create({
+            data: {
+                ...rest,
+                date: new Date(data.date),
+                inorganicDescription: {
+                    createMany: {
+                        data: data.inorganicDescription.map((description) => ({
+                            text: description,
+                        })),
+                    },
+                },
+                residueComposition: {
+                    createMany: {
+                        data: [
+                            ...data.organicResidueComposition.map((file) => ({
+                                image: file.buffer,
+                                type: FormImageType.ORGANIC,
+                            })),
+                            ...data.inorganicResidueComposition.map((file) => ({
+                                image: file.buffer,
+                                type: FormImageType.INORGANIC,
+                            })),
+                        ],
+                    },
+                },
+                organicDescription: {
+                    createMany: {
+                        data: data.organicDescription.map((description) => ({
+                            text: description,
+                        })),
+                    },
+                },
+            },
+        });
+
+        res.json({
+            message: "Formulário submetido com sucesso",
+            id: form.id,
+        });
     }
 
     public static async image(req: Request, res: Response) {
@@ -62,81 +110,16 @@ export default class FormsController {
             res.status(400).json({ message: "Id mal formatado" });
             return;
         }
-        const partner = await prisma.partner.findUnique({
+        const formImage = await prisma.formImage.findUnique({
             where: {
                 id: Number(req.params.id),
             },
         });
-        if (!partner) {
-            res.status(404).json({ message: "Parceiro não encontrado" });
+        if (!formImage) {
+            res.status(404).json({ message: "Imagem não encontrado" });
             return;
         }
         res.setHeader("Content-Type", "image/png");
-        res.send(partner.image);
-    }
-
-    public static async delete(req: Request, res: Response) {
-        if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Id mal formatado" });
-            return;
-        }
-        const partner = await prisma.partner
-            .delete({
-                where: {
-                    id: Number(req.params.id),
-                },
-            })
-            .catch((e) => {
-                if (e.code === "P2025") return null;
-                throw e;
-            });
-        if (!partner) {
-            res.status(404).json({ message: "Parceiro não encontrado" });
-            return;
-        }
-        res.json({ message: "Parceiro deletado com sucesso" });
-    }
-
-    public static async update(req: Request, res: Response) {
-        if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Id mal formatado" });
-            return;
-        }
-        const { data, error } = await UpdatePartnerSchema.safeParseAsync({
-            name: req.body.name,
-            description: req.body.description,
-            image: req.file,
-        });
-        if (error) {
-            res.status(400).json({ errors: error?.errors });
-            return;
-        }
-
-        const partner = await prisma.partner
-            .update({
-                where: {
-                    id: Number(req.params.id),
-                },
-                data: {
-                    name: data.name,
-                    description: data.description,
-                    image: data.image ? data.image.buffer : undefined,
-                },
-                select: {
-                    image: false,
-                    description: true,
-                    name: true,
-                    id: true,
-                },
-            })
-            .catch((e) => {
-                if (e.code === "P2025") return null;
-                throw e;
-            });
-        if (!partner) {
-            res.status(404).json({ message: "Parceiro não encontrado" });
-            return;
-        }
-        res.json(partner);
+        res.send(formImage.image);
     }
 }
