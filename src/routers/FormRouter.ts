@@ -1,11 +1,13 @@
 import { Router } from "express";
 import FormController from "../controllers/FormController";
 import { upload } from "../server";
+import VerifyToken from "../middlewares/VerifyToken";
 
 const FormRouter = Router();
 
 FormRouter.post(
     "/",
+    VerifyToken(),
     upload.fields([
         {
             name: "organicResidueComposition",

@@ -67,6 +67,7 @@ export default class FormsController {
         const form = await prisma.form.create({
             data: {
                 ...rest,
+                userId: req.user!.id,
                 date: new Date(data.date),
                 inorganicDescription: {
                     createMany: {

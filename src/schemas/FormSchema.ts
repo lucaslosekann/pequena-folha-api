@@ -10,16 +10,20 @@ export const CreateFormSchema = z.object({
     organicDescriptionOther: z.string().optional(),
     wastes: z.string(),
     wastesVolume: z.coerce.number(),
-    organicResidueComposition: z.array(
-        z.object({
-            buffer: z.instanceof(Buffer),
-        })
-    ),
-    inorganicResidueComposition: z.array(
-        z.object({
-            buffer: z.instanceof(Buffer),
-        })
-    ),
+    organicResidueComposition: z
+        .array(
+            z.object({
+                buffer: z.instanceof(Buffer),
+            })
+        )
+        .default([]),
+    inorganicResidueComposition: z
+        .array(
+            z.object({
+                buffer: z.instanceof(Buffer),
+            })
+        )
+        .default([]),
     inorganicDescription: z.array(z.string()),
     organicDescription: z.array(z.string()),
 });
