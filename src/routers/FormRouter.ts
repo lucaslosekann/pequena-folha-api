@@ -21,8 +21,8 @@ FormRouter.post(
     FormController.create
 );
 
-FormRouter.get("/", FormController.index);
-FormRouter.get("/:id", FormController.show);
+FormRouter.get("/", VerifyToken(true), FormController.index);
+FormRouter.get("/:id", VerifyToken(true), FormController.show);
 FormRouter.get("/image/:id", FormController.image);
 
 export default FormRouter;

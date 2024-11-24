@@ -1,11 +1,12 @@
 import { Router } from "express";
 import AgendaController from "../controllers/AgendaController";
+import VerifyToken from "../middlewares/VerifyToken";
 
 const AgendaRouter = Router();
 
-AgendaRouter.get("/", AgendaController.index);
-AgendaRouter.post("/", AgendaController.create);
-AgendaRouter.put("/:id", AgendaController.update);
-AgendaRouter.delete("/:id", AgendaController.delete);
+AgendaRouter.get("/", VerifyToken(), AgendaController.index);
+AgendaRouter.post("/", VerifyToken(true), AgendaController.create);
+AgendaRouter.put("/:id", VerifyToken(true), AgendaController.update);
+AgendaRouter.delete("/:id", VerifyToken(true), AgendaController.delete);
 
 export default AgendaRouter;
