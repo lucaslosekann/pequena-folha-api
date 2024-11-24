@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -37,28 +37,10 @@ model User {
   updatedAt      DateTime @updatedAt
 }
 
-
-
-model Forms {
-  id                          Int      @id @default(autoincrement())
-  name                        String
-  date                        DateTime
-  vol_inorganic               Int
-  vol_inorganic_other         Int
-  mass_inorganic              Int
-  description_inorganic       String
-  description_inorganic_other String
-  inorganic_image             Bytes
-  vol_organic                 Int
-  vol_organic_other           Int
-  mass_organic                Int
-  description_organic         String
-  description_organic_other   String
-  organic_image               Bytes
-  vol_residue                 Int
-  mass_organic                Int
-  description_residue         String
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
-}   
-
+model Agenda {
+  id          Int      @id @default(autoincrement())
+  dateTime    DateTime
+  place       String
+  type        String
+  description String   @db.LongText
+}

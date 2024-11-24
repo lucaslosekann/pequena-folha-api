@@ -59,7 +59,7 @@ export default class PartnersController {
 
     public static async delete(req: Request, res: Response) {
         if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Id mal formatado" });
+            res.status(400).json({ message: "Id mal formatado!" });
             return;
         }
         const partner = await prisma.partner
@@ -81,7 +81,7 @@ export default class PartnersController {
 
     public static async update(req: Request, res: Response) {
         if (!req.params.id || isNaN(Number(req.params.id))) {
-            res.status(400).json({ message: "Id mal formatado" });
+            res.status(400).json({ message: "Id mal formatado!" });
             return;
         }
         const { data, error } = await UpdatePartnerSchema.safeParseAsync({
@@ -116,7 +116,7 @@ export default class PartnersController {
                 throw e;
             });
         if (!partner) {
-            res.status(404).json({ message: "Parceiro não encontrado" });
+            res.status(404).json({ message: "Parceiro não encontrado!" });
             return;
         }
         res.json(partner);

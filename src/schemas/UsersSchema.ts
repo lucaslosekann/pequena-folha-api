@@ -14,12 +14,12 @@ export const CreatePasswordSchema = z.object({
         password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
     }),
     params: z.object({
-        id: z.number(),
+        id: z.string().refine((id) => !isNaN(Number(id))).transform(Number),
     }),
 });
 
 export const DeactivateUserSchema = z.object({
     params: z.object({
-        id: z.number(),
+        id: z.string().refine((id) => !isNaN(Number(id))).transform(Number),
     }),
 });

@@ -3,7 +3,7 @@ import { prisma } from "../server";
 import { CreatePasswordSchema, CreateUserSchema, DeactivateUserSchema } from "../schemas/UsersSchema";
 import { hash } from "bcrypt";
 
-export default class PartnersController {
+export default class UsersController {
     static async create(req: Request, res: Response) {
         const { data, error } = await CreateUserSchema.safeParseAsync(req.body);
         if (error) {
