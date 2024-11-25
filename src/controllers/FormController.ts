@@ -64,10 +64,24 @@ export default class FormsController {
         }
         const { organicResidueComposition: _, inorganicResidueComposition: __, ...rest } = data;
 
+        const user = await prisma.user.findUnique({
+            where: {
+                id: req.user!.id,
+            },
+        });
+        if (!user) {
+            res.status(404).json({ message: "Usuário não encontrado" });
+            return;
+        }
+        if (!user.active) {
+            res.status(403).json({ message: "Usuário não ativo" });
+            return;
+        }
+
         const form = await prisma.form.create({
             data: {
                 ...rest,
-                userId: req.user!.id,
+                userId: user.id,
                 date: new Date(data.date),
                 inorganicDescription: {
                     createMany: {

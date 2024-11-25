@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../server";
-import { CreatePasswordSchema, CreateUserSchema, DeactivateUserSchema } from "../schemas/UsersSchema";
+import { ActivateUserSchema, ChangePasswordSchema, CreateUserSchema, DeactivateUserSchema } from "../schemas/UsersSchema";
 import { hash } from "bcrypt";
 
 export default class UsersController {
@@ -29,12 +29,16 @@ export default class UsersController {
     }
 
     static async index(req: Request, res: Response) {
-        const users = await prisma.user.findMany();
-        res.json(users);
+        const users = await prisma.user.findMany({
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+        res.json(users.map((user) => ({ ...user, password: undefined, hasPassword: user.password != null })));
     }
 
-    static async createPassword(req: Request, res: Response) {
-        const { data, error } = await CreatePasswordSchema.safeParseAsync({
+    static async changePassword(req: Request, res: Response) {
+        const { data, error } = await ChangePasswordSchema.safeParseAsync({
             body: req.body,
             params: req.params,
         });
@@ -51,10 +55,7 @@ export default class UsersController {
             res.status(404).json({ message: "Usuário não encontrado" });
             return;
         }
-        if (user.password != null) {
-            res.status(400).json({ message: "Senha já cadastrada" });
-            return;
-        }
+
         const passwordHash = await hash(data.body.password, 10);
         await prisma.user.update({
             where: {
@@ -62,10 +63,10 @@ export default class UsersController {
             },
             data: {
                 password: passwordHash,
-                active: true,
+                ...(user.password ? {} : { active: true }),
             },
         });
-        res.json({ message: "Senha criada com sucesso" });
+        res.json({ message: "Senha atualizada com sucesso" });
     }
 
     static async deactivate(req: Request, res: Response) {
@@ -94,5 +95,38 @@ export default class UsersController {
             },
         });
         res.json({ message: "Usuário desativado com sucesso" });
+    }
+
+    static async activate(req: Request, res: Response) {
+        const { data, error } = await ActivateUserSchema.safeParseAsync({
+            params: req.params,
+        });
+        if (error) {
+            res.status(400).json({ errors: error?.errors });
+            return;
+        }
+        const user = await prisma.user.findUnique({
+            where: {
+                id: data.params.id,
+            },
+        });
+        if (!user) {
+            res.status(404).json({ message: "Usuário não encontrado" });
+            return;
+        }
+        if (!user.password) {
+            res.status(400).json({ message: "Usuário precisa ter uma senha definida para ser ativado" });
+            return;
+        }
+
+        await prisma.user.update({
+            where: {
+                id: data.params.id,
+            },
+            data: {
+                active: true,
+            },
+        });
+        res.json({ message: "Usuário ativado com sucesso" });
     }
 }

@@ -9,17 +9,32 @@ export const CreateUserSchema = z.object({
     addressDetails: z.string().min(3),
 });
 
-export const CreatePasswordSchema = z.object({
+export const ChangePasswordSchema = z.object({
     body: z.object({
         password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
     }),
     params: z.object({
-        id: z.string().refine((id) => !isNaN(Number(id))).transform(Number),
+        id: z
+            .string()
+            .refine((id) => !isNaN(Number(id)))
+            .transform(Number),
     }),
 });
 
 export const DeactivateUserSchema = z.object({
     params: z.object({
-        id: z.string().refine((id) => !isNaN(Number(id))).transform(Number),
+        id: z
+            .string()
+            .refine((id) => !isNaN(Number(id)))
+            .transform(Number),
+    }),
+});
+
+export const ActivateUserSchema = z.object({
+    params: z.object({
+        id: z
+            .string()
+            .refine((id) => !isNaN(Number(id)))
+            .transform(Number),
     }),
 });
