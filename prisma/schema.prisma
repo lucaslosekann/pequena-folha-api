@@ -38,9 +38,19 @@ model User {
 }
 
 model Agenda {
-  id          Int      @id @default(autoincrement())
-  dateTime    DateTime
-  place       String
-  type        String
-  description String   @db.LongText
+  id             Int            @id @default(autoincrement())
+  dateTime       DateTime
+  place          String
+  type           String
+  description    String         @db.LongText
+  additionalText String?        @db.LongText
+  eventsImages   EventsImages[]
+}
+
+model EventsImages {
+  id      Int   @id @default(autoincrement())
+  eventId Int
+  image   Bytes
+
+  Agenda Agenda @relation(fields: [eventId], references: [id])
 }
