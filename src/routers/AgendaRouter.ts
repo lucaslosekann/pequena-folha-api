@@ -10,5 +10,6 @@ AgendaRouter.post("/", AgendaController.create);
 AgendaRouter.put("/:id", AgendaController.update);
 AgendaRouter.put("/previous/:id", upload.array("image"), AgendaController.updatePreviousEvent);
 AgendaRouter.delete("/:id", AgendaController.delete);
+AgendaRouter.delete("/image/:id", AgendaController.delete_image);
 
 export default AgendaRouter;
