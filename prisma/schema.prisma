@@ -53,7 +53,7 @@ model EventsImages {
   eventId Int
   image   Bytes
 
-  Agenda Agenda @relation(fields: [eventId], references: [id])
+  Agenda Agenda @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Form {
