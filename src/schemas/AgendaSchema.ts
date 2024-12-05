@@ -35,6 +35,10 @@ export const UpdatePreviousEventSchema = z.object({
             })
         )
         .default([]),
+    imagesToDelete: z
+        .array(z.coerce.number())
+        .default([])
+        .or(z.coerce.number().transform((v) => [v])),
 });
 
 export const DeleteEventSchema = z.object({

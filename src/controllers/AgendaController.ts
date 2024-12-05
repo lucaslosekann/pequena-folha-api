@@ -7,7 +7,6 @@ import {
     UpdatePreviousEventSchema,
     GetEventImageSchema,
 } from "../schemas/AgendaSchema";
-import { read } from "fs";
 
 export default class AgendaController {
     public static async index(req: Request, res: Response) {
@@ -136,6 +135,7 @@ export default class AgendaController {
             },
             additionalText: req.body.additionalText,
             image: req.files,
+            imagesToDelete: req.body.imagesToDelete,
         });
         if (error) {
             res.status(400).json({ errors: error?.errors });
@@ -155,6 +155,9 @@ export default class AgendaController {
                                 return { image: eventImages.buffer };
                             }),
                         },
+                        deleteMany: data.imagesToDelete.map((id) => {
+                            return { id };
+                        }),
                     },
                 },
                 select: {

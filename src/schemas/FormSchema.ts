@@ -2,14 +2,16 @@ import { z } from "zod";
 
 export const CreateFormSchema = z.object({
     date: z.string().date(),
-    inorganicVolume: z.coerce.number(),
+    inorganicVolume: z.string(),
+    inorganicVolumeOther: z.string().optional(),
     inorganicWeight: z.coerce.number(),
     inorganicDescriptionOther: z.string().optional(),
-    organicVolume: z.coerce.number(),
+    organicVolume: z.string(),
+    organicVolumeOther: z.string().optional(),
     organicWeight: z.coerce.number(),
     organicDescriptionOther: z.string().optional(),
     wastes: z.string(),
-    wastesVolume: z.coerce.number(),
+    wastesVolume: z.string(),
     organicResidueComposition: z
         .array(
             z.object({

@@ -60,14 +60,14 @@ model Form {
   id                        Int                    @id @default(autoincrement())
   userId                    Int
   date                      DateTime
-  inorganicVolume           Int
+  inorganicVolume           String
   inorganicWeight           Int
   inorganicDescriptionOther String?
-  organicVolume             Int
+  organicVolume             String
   organicWeight             Int
   organicDescriptionOther   String?
   wastes                    String
-  wastesVolume              Int
+  wastesVolume              String
   residueComposition        FormImage[]
   inorganicDescription      InorganicDescription[]
   organicDescription        OrganicDescription[]

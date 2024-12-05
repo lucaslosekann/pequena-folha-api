@@ -15,6 +15,11 @@ export default class FormsController {
                         type: true,
                     },
                 },
+                User: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
         });
         res.json(forms);
@@ -62,7 +67,7 @@ export default class FormsController {
             res.status(400).json({ error });
             return;
         }
-        const { organicResidueComposition: _, inorganicResidueComposition: __, ...rest } = data;
+        const { organicResidueComposition: _, inorganicResidueComposition: __, inorganicVolumeOther, organicVolumeOther, ...rest } = data;
 
         const user = await prisma.user.findUnique({
             where: {
@@ -81,6 +86,8 @@ export default class FormsController {
         const form = await prisma.form.create({
             data: {
                 ...rest,
+                inorganicVolume: data.inorganicVolume == "outro" ? inorganicVolumeOther ?? "Outro" : data.inorganicVolume,
+                organicVolume: data.organicVolume == "outro" ? organicVolumeOther ?? "Outro" : data.organicVolume,
                 userId: user.id,
                 date: new Date(data.date),
                 inorganicDescription: {
