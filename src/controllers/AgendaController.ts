@@ -204,4 +204,33 @@ export default class AgendaController {
         }
         res.json({ message: "Evento deletado com sucesso!" });
     }
+
+    public static async delete_image(req: Request, res: Response) {
+        const { data, error } = await GetEventImageSchema.safeParseAsync({
+            params: {
+                id: Number(req.params.id),
+            },
+        });
+
+        if (error) {
+            res.status(400).json({ errors: error?.errors });
+            return;
+        }
+
+        const partner = await prisma.eventsImages
+            .delete({
+                where: {
+                    id: data.params.id,
+                },
+            })
+            .catch((e) => {
+                if (e.code === "P2025") return null;
+                throw e;
+            });
+        if (!partner) {
+            res.status(404).json({ message: "Imagem não encontrada!" });
+            return;
+        }
+        res.json({ message: "Imagem deletada com sucesso!" });
+    }
 }
