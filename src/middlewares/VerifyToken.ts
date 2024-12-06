@@ -13,7 +13,6 @@ export default function VerifyToken(admin = false) {
         const [bearer, token] = authorization?.split(" ") || [];
 
         if (bearer !== "Bearer" || !token) {
-            console.log(authorization);
             res.status(401).send({ message: "Token malformed" });
             return;
         }
@@ -22,7 +21,7 @@ export default function VerifyToken(admin = false) {
             const user = jwt.verify(token, ENV.JWT_SECRET);
             req.user = user as Omit<User, "password">;
             if (admin && !req.user.isAdmin) {
-                res.status(403).send({ message: "Unauthorized" });
+                res.status(403).send({ message: "Forbidden" });
                 return;
             }
             next();
